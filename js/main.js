@@ -27,6 +27,12 @@ test = new GameDates();
 console.log("test6 = ", test);
 
 
+function getMLBDates(target){
+    console.log("target = ",target);
+    console.log("handling", target.getAttribute("type") + " " + target.id);
+}
+
+
 // AJAX asynchronous XMLHttpRequest to get the JSON
 // from the site defined by url and using the
 // callback function callback (alias for myCallBack)
