@@ -7,80 +7,37 @@ const ISOK = 200;
 // set up global variables
 let beginningDate = new Date(2019,6,12);
 console.log("beginning date first instantiated ", beginningDate);
-/*
-let test = new GameDates();
-console.log("test1 = ", test);
 
-test = new GameDates();
-console.log("test2 = ", test);
-
-test = new GameDates();
-console.log("test3 = ", test);
-
-test = new GameDates();
-console.log("test4 = ", test);
-
-test = new GameDates();
-console.log("test5 = ", test);
-
-test = new GameDates();
-console.log("test6 = ", test);
-*/
-
+// handle the start button by requesting new Dates and then
+// requesting new Games
 function getMLBDates(target){
     console.log("target = ",target);
     console.log("handling", target.getAttribute("type") + " " + target.id);
 
+    // set the number of interactions
     let interactions = 5;
-
+    // call the function to request a new date and games
     requestDate();
 
     function requestDate(){
-
+        //first test interactions counter and then decrement
         if(interactions--===0) return false;
-
-        console.log(new GameDates());
-
+        //request game data for a new date
+        getBaseballDataAsynch(new GameDates());
+        // set a timeout that will execute the same function iteractively
         window.setTimeout(requestDate, 3000);
-
-    }
-
-}
-
-
-// AJAX asynchronous XMLHttpRequest to get the JSON
-// from the site defined by url and using the
-// callback function callback (alias for myCallBack)
-function getJSONAsync(url, callback) {
-    var request = new XMLHttpRequest();
-    request.onreadystatechange = function () {
-        if (request.readyState === ISFINISHED && request.status === ISOK) {
-            // display all the data
-            document.getElementById("jsonDiv").innerHTML = request.responseText;
-
-            // finally convert the returned data to a JavaScript object
-            // use the Chrome debugger to inspect this variable
-            var jsObject = JSON.parse(request.responseText);
-            
-            // here's some sample data from within the jsObject object
-            var test = jsObject.data.games.game[0].home_team_name;
-            
-            // convert the jsObject object back into a different json string
-            var newJSON = JSON.stringify(jsObject);
-        }
-    };
-    // open a connection using the URL
-    request.open("GET", url);
-    // send the GET request
-    request.send();
-}
+    }//requestDate()
+}//getMLBDates(target)
 
 // onload event handler creates the URL
 // for a given year month and day
-function getBaseballDataAsynch() {
-    var year = "2018";
-    var month = "07";
-    var day = "08";
+function getBaseballDataAsynch(gameDate) {
+    
+    if(gameDate===undefined || gameDate===null) return false;
+
+    let year = gameDate.gameYear;
+    let month = gameDate.gameMonth;
+    let day = gameDate.gameDay;
 
     // build a URL as required by the MLB site
     var tempURL = "http://gd2.mlb.com/components/game/mlb/year_" + year + "/month_" + month + "/day_" + day + "/master_scoreboard.json";
@@ -90,15 +47,37 @@ function getBaseballDataAsynch() {
 
     // get the data for the specified date with an asynchronous call
     // the result will be seen above in the callBack function
-    getJSONAsync(tempURL);
+    var request = new XMLHttpRequest();
+    
+    request.onreadystatechange = function () {
+        if (request.readyState === ISFINISHED && request.status === ISOK) {
+            // finally convert the returned data to a JavaScript object
+            // use the Chrome debugger to inspect this variable
+            var jsObject = JSON.parse(request.responseText);
+            
+            // convert the jsObject object back into a different json string
+            var newJSON = JSON.stringify(jsObject);
+
+            // display all the data
+            document.getElementById("jsonDiv").innerHTML = newJSON;
+        }
+    };
+    // open a connection using the URL
+    request.open("GET", tempURL);
+    // send the GET request
+    request.send();;
+
 }
 
+// generate game dates
 function GameDates(gameDate = null){
    
     this.gameYear;
     this.gameMonth;
     this.gameDay;
 
+    // gameDate will be null in the first interation
+    // then it assumes the beginning date
     if(gameDate===null){
         gameDate=beginningDate;
         this.gameYear = gameDate.getFullYear();
@@ -106,16 +85,16 @@ function GameDates(gameDate = null){
         this.gameDay = (gameDate.getDate() < 10) ? "0" + gameDate.getDate() : String(gameDate.getDate());
     }
 
-    function returnDates(){
-        gameDate.setDate(gameDate.getDate()+1);
+    // function returned by the GameDates function
+    // it only increments the date in the gameDate object
+    // it uses the closure feature from JS
+    // gameDate is first defined and then keeps its instance for the
+    // next interactions
+    function returnDates(){ 
         console.log("===============================================");
         console.log("gamedate inside returnDates function:",gameDate);
-        let response = {
-            gameYear : String(this.gameYear),
-            gameMonth : (+this.gameMonth + 1) < 10 ? "0" + (+this.gameMonth + 1) : String(+this.gameMonth + 1),
-            gameDay : (this.gameDay) < 10 ? "0" + (this.gameDay) : String(this.gameDay)
-        };
-    }
+        gameDate.setDate(gameDate.getDate()+1);
+    }//returnDates()
 
     return returnDates();
     
