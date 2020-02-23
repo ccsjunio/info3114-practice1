@@ -7,7 +7,7 @@ const ISOK = 200;
 // set up global variables
 let beginningDate = new Date(2019,6,12);
 console.log("beginning date first instantiated ", beginningDate);
-
+/*
 let test = new GameDates();
 console.log("test1 = ", test);
 
@@ -25,11 +25,26 @@ console.log("test5 = ", test);
 
 test = new GameDates();
 console.log("test6 = ", test);
-
+*/
 
 function getMLBDates(target){
     console.log("target = ",target);
     console.log("handling", target.getAttribute("type") + " " + target.id);
+
+    let interactions = 5;
+
+    requestDate();
+
+    function requestDate(){
+
+        if(interactions--===0) return false;
+
+        console.log(new GameDates());
+
+        window.setTimeout(requestDate, 3000);
+
+    }
+
 }
 
 
